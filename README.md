@@ -106,7 +106,20 @@ pip install gunicorn
 ```
 gunicorn --bind 0.0.0.0:8001 whatimage.wsgi:application
 ```
-
+## check the log
+```
+gunicorn --bind 0.0.0.0:8001 --daemon whatimage.wsgi:application --log-file /home/ubuntu/RGB_Analyzer_django_react/server_log/logfile.log
+```
+```
+tail -f /home/ubuntu/RGB_Analyzer_django_react/server_log/logfile.log
+```
+## kill server
+```
+ps aux | grep gunicorn
+```
+```
+kill -9 <PID>
+```
 
 # request example
 ```
