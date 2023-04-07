@@ -53,7 +53,7 @@ class Image(models.Model):
             # file did not exists
             return False
 
-    def delete_old_files(self, max_files=2):
+    def delete_old_files(self, max_files=1000):
         processed_images_dir = os.path.join(self.MEDIA_ROOT, 'processed_images')
         media_root_dir = self.MEDIA_ROOT
         for directory in [processed_images_dir, media_root_dir]:
