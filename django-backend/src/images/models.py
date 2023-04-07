@@ -9,6 +9,7 @@ import numpy as np
 import math
 from io import BytesIO
 from django.core.files.base import ContentFile
+from django.conf import settings
 import time
 
 DEBUG = False
@@ -24,7 +25,7 @@ class Image(models.Model):
 
     BASE_PATH = os.path.dirname(os.path.abspath(__file__))
     ROOT_PATH = Path(BASE_PATH).parent.parent
-
+    MEDIA_ROOT = settings.MEDIA_ROOT
     def __str__(self):
         return "Image analyzed at {}".format(self.uploaded_time.strftime("%Y-%m-%d %H:%M"))
 
@@ -51,22 +52,16 @@ class Image(models.Model):
         else:
             # file did not exists
             return False
-    def cleanup_media(self):
-        """
-        Deletes all files in the media_root directory matching the pattern *.*
-        and *_processed.*, and limits the number of files to a maximum of 10.
-        """
-        media_root = Path('/home/ubuntu/RGB_Analyzer_django_react/django_backend/media_root')
-        all_files = list(media_root.glob('*.*'))
-        processed_files = list(media_root.glob('*_processed.*'))
-        files_to_delete = all_files + processed_files
-        # sort files by modification time, oldest first
-        files_to_delete.sort(key=lambda f: f.stat().st_mtime)
-        num_files_to_delete = len(files_to_delete) - 10
-        if num_files_to_delete > 0:
-            for file in files_to_delete[:num_files_to_delete]:
-                os.remove(file)
-                print(f'Removing {file}')
+
+    def delete_old_files(self, max_files=2):
+        processed_images_dir = os.path.join(self.MEDIA_ROOT, 'processed_images')
+        media_root_dir = self.MEDIA_ROOT
+        for directory in [processed_images_dir, media_root_dir]:
+            files = glob.glob(os.path.join(directory, '*'))
+            if len(files) > max_files:
+                files.sort(key=os.path.getmtime)
+                for file_path in files[:len(files) - max_files]:
+                    os.remove(file_path)
 
     def save(self, *args, **kwargs):
         try:
@@ -89,7 +84,7 @@ class Image(models.Model):
 
             # YOLO image processing to here------------------------------------------------------------------------
             # FIND ROI from here ----------------------------------------------------------------------------------
- 
+
             SD = SampleDetector()
             output_dic = SD.detect_samples(DEBUG,input_image,self.e_hr,self.e_min)
             result_image = output_dic["image"]
@@ -111,7 +106,7 @@ class Image(models.Model):
                 print('File not Exist. Can not Delete it! ...')
 
             print('Analyze success!')
-	    self.cleanup_media()
+            self.delete_old_files()
         except Exception as e:
             print('Analyze failed: ', e)
         super().save(*args, **kwargs)
