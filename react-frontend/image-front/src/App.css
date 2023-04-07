@@ -1,0 +1,17 @@
+.App {
+  text-align: center;
+}
+
+.analyzed-results {
+  /* Add your custom styles here */
+  font-family: 'Arial', sans-serif;
+  font-size: 18px;
+  font-weight: 400; /* Semi-bold */
+  text-align: center;
+  /* font-style: italic; */
+}
+
+.auto-line-break {
+  white-space: pre-wrap; /* Preserves whitespace and breaks lines */
+  word-wrap: break-word; /* Allows long unbreakable words to break onto the next line */
+}
