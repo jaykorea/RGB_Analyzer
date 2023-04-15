@@ -215,47 +215,47 @@ class Classifier extends Component {
           </div>
         </div>
       )}
-<label htmlFor="exposure_time" className="col-form-label">
-  Exposure Time
-</label>
-<Form>
-  {this.state.recentImage ? null : (
-    <React.Fragment>
-      <div className="row justify-content-center" style={{ marginTop: '5px' }}>
-        <div className="col-sm-3">
-          <input
-            type="number"
-            className="form-control"
-            placeholder=""
-            id="exposure_hour"
-            name="e_hr"
-            value={this.state.e_hr}
-            onChange={this.handleEhrChange}
-            min="0"
-          />
-        </div>
-        <label htmlFor="exposure_hour" className="col-form-label">
-          h
-        </label>
-        <div className="col-sm-3">
-          <input
-            type="number"
-            className="form-control"
-            placeholder=""
-            id="exposure_min"
-            name="e_min"
-            value={this.state.e_min}
-            onChange={this.handleEminChange}
-            min="0"
-          />
-        </div>
-        <label htmlFor="exposure_min" className="col-form-label">
-          m
-        </label>
-      </div>
-    </React.Fragment>
-  )}
-</Form>
+                <label htmlFor="exposure_time" className="col-form-label">
+                  Exposure Time
+                </label>
+                <Form>
+                  {this.state.recentImage ? null : (
+                    <React.Fragment>
+                      <div className="row justify-content-center" style={{ marginTop: '5px' }}>
+                        <div className="col-sm-3">
+                          <input
+                            type="number"
+                            className="form-control"
+                            placeholder=""
+                            id="exposure_hour"
+                            name="e_hr"
+                            value={this.state.e_hr}
+                            onChange={this.handleEhrChange}
+                            min="0"
+                          />
+                        </div>
+                        <label htmlFor="exposure_hour" className="col-form-label">
+                          h
+                        </label>
+                        <div className="col-sm-3">
+                          <input
+                            type="number"
+                            className="form-control"
+                            placeholder=""
+                            id="exposure_min"
+                            name="e_min"
+                            value={this.state.e_min}
+                            onChange={this.handleEminChange}
+                            min="0"
+                          />
+                        </div>
+                        <label htmlFor="exposure_min" className="col-form-label">
+                          m
+                        </label>
+                      </div>
+                    </React.Fragment>
+                  )}
+                </Form>
                 {this.state.files.length > 0 && (
                   (this.state.e_hr !== "" && this.state.e_min !== "")  && (parseInt(this.state.e_hr) >= 0 && parseInt(this.state.e_min) >= 0) && (parseInt(this.state.e_hr) !== 0 || parseInt(this.state.e_min) !== 0) ? (
                     <Button variant="info" size="lg" className="mt-3" onClick={this.sendImage}>Analyze</Button>
