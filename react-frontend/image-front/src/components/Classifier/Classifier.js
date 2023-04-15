@@ -190,21 +190,21 @@ class Classifier extends Component {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        width: '100%',
-        minHeight: '250px',
-        border: '2px dashed #ccc',
+        minHeight: '330px',
+        marginBottom: '25px',
       };
       let imageStyle = {
         maxWidth: `${dropzoneDimensions.width * 0.99}px`,
         maxHeight: `${dropzoneDimensions.height * 0.9}px`,
         objectFit: 'contain',
+        border: '1px dashed #ccc',
       };
       let dropzoneStyle = {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         width: `${dropzoneDimensions.width}px`,
-        height: `${dropzoneDimensions}px`,
+        maxHeight: '330px', // set a max-height here
       };
     
       const files = this.state.files.map((file) => (
@@ -241,7 +241,7 @@ class Classifier extends Component {
                   <React.Fragment>
                 <div className="row justify-content-center" style={{ marginTop: '5px' }}>
                   <label htmlFor="exposure_time" className="col-form-label">
-                    Exposure Time
+                    Exposure Time:
                   </label>
                 <div className="col-sm-2 col-md-4">
                   <input
