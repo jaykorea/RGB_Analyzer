@@ -57,7 +57,7 @@ INSTALLED_APPS = [
 if DEBUG == True:
     CORS_ORIGIN_ALLOW_ALL = True
 else:
-    CORS_ORIGIN_WHITELIST = ['http://127.0.0.1:8001', 'http://localhost:8001', 'http://www.zeroexposure1905.com', 'https://www.zeroexposure1905.com']
+    CORS_ORIGIN_WHITELIST = ['http://127.0.0.1:8001','http://127.0.0.1:3001', 'http://localhost:8001','http://localhost:3001', 'http://www.zeroexposure1905.com', 'https://www.zeroexposure1905.com']
     
 CORS_ALLOW_CREDENTIALS = True
 

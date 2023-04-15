@@ -16,7 +16,7 @@ export function getIPv4Address(hostname) {
 }
 
 export function getReqUrlAddress() {
-    return axios.get('http://127.0.0.1:8001/api/get_req_url/')
+    return axios.get('/api/get_req_url/')
     .then(response => {
       return response.data.req_url; // change 'ip_address' to 'req_url'
     })

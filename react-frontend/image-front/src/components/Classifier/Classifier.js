@@ -30,10 +30,24 @@ class Classifier extends Component {
       this.dropzoneRef = React.createRef();
     }
     componentDidMount() {
-      // Update the dimensions of the dropzone box
+      // Add a resize event listener to the window
+      window.addEventListener('resize', this.handleResize);
+      // Get the initial dimensions of the dropzone
       const { width, height } = this.dropzoneRef.current.getBoundingClientRect();
       this.setState({ dropzoneDimensions: { width, height } });
     }
+  
+    componentWillUnmount() {
+      // Remove the resize event listener when the component unmounts
+      window.removeEventListener('resize', this.handleResize);
+    }
+  
+    handleResize = () => {
+      // Update the dimensions of the dropzone when the window resizes
+      const { width, height } = this.dropzoneRef.current.getBoundingClientRect();
+      this.setState({ dropzoneDimensions: { width, height } });
+    };
+
     // event handler for e_hr input field
     handleEhrChange = (event) => {
         this.setState({ e_hr: event.target.value });
@@ -177,13 +191,20 @@ class Classifier extends Component {
         justifyContent: 'center',
         alignItems: 'center',
         width: '100%',
-        height: '300px',
+        minHeight: '250px',
         border: '2px dashed #ccc',
       };
       let imageStyle = {
-        maxWidth: dropzoneDimensions.width,
-        maxHeight: dropzoneDimensions.height,
+        maxWidth: `${dropzoneDimensions.width * 0.99}px`,
+        maxHeight: `${dropzoneDimensions.height * 0.9}px`,
         objectFit: 'contain',
+      };
+      let dropzoneStyle = {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: `${dropzoneDimensions.width}px`,
+        height: `${dropzoneDimensions}px`,
       };
     
       const files = this.state.files.map((file) => (
@@ -204,9 +225,9 @@ class Classifier extends Component {
             ) : (
               <Dropzone onDrop={this.onDrop} accept="image/png, image/jpeg">
                 {({ isDragActive, getRootProps, getInputProps }) => (
-                  <div {...getRootProps({ className: 'dropzone back' })} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                  <div {...getRootProps({ className: 'dropzone back' })} style={{ ...dropzoneStyle, display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center' }}>
                     <input {...getInputProps()} />
-                    <i className="far fa-images mb-2 text-muted" style={{ fontSize: 100 }}></i>
+                    <i className="fa fa-cloud-upload fa-4x text-muted" style={{ fontSize: 120 }}></i>
                     <p className="text-muted">{isDragActive ? 'Drop some images' : "Drag 'n' drop some files here, or click to select files"}</p>
                   </div>
                 )}
@@ -215,47 +236,50 @@ class Classifier extends Component {
           </div>
         </div>
       )}
-                <label htmlFor="exposure_time" className="col-form-label">
-                  Exposure Time
+              <Form>
+                {this.state.recentImage ? null : (
+                  <React.Fragment>
+                <div className="row justify-content-center" style={{ marginTop: '5px' }}>
+                  <label htmlFor="exposure_time" className="col-form-label">
+                    Exposure Time
+                  </label>
+                <div className="col-sm-2 col-md-4">
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder=""
+                    id="exposure_hour"
+                    name="e_hr"
+                    value={this.state.e_hr}
+                    onChange={this.handleEhrChange}
+                    min="0"
+                    style={{ width: '100%' }}
+                  />
+                </div>
+                <label htmlFor="exposure_hour" className="col-form-label">
+                  h
                 </label>
-                <Form>
-                  {this.state.recentImage ? null : (
-                    <React.Fragment>
-                      <div className="row justify-content-center" style={{ marginTop: '5px' }}>
-                        <div className="col-sm-3">
-                          <input
-                            type="number"
-                            className="form-control"
-                            placeholder=""
-                            id="exposure_hour"
-                            name="e_hr"
-                            value={this.state.e_hr}
-                            onChange={this.handleEhrChange}
-                            min="0"
-                          />
-                        </div>
-                        <label htmlFor="exposure_hour" className="col-form-label">
-                          h
-                        </label>
-                        <div className="col-sm-3">
-                          <input
-                            type="number"
-                            className="form-control"
-                            placeholder=""
-                            id="exposure_min"
-                            name="e_min"
-                            value={this.state.e_min}
-                            onChange={this.handleEminChange}
-                            min="0"
-                          />
-                        </div>
-                        <label htmlFor="exposure_min" className="col-form-label">
-                          m
-                        </label>
-                      </div>
-                    </React.Fragment>
-                  )}
-                </Form>
+                <div className="col-sm-2 col-md-4">
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder=""
+                    id="exposure_min"
+                    name="e_min"
+                    value={this.state.e_min}
+                    onChange={this.handleEminChange}
+                    min="0"
+                    style={{ width: '100%' }}
+                  />
+                </div>
+                <label htmlFor="exposure_min" className="col-form-label">
+                  m
+                </label>
+              </div>
+                  </React.Fragment>
+                )}
+              </Form>
+
                 {this.state.files.length > 0 && (
                   (this.state.e_hr !== "" && this.state.e_min !== "")  && (parseInt(this.state.e_hr) >= 0 && parseInt(this.state.e_min) >= 0) && (parseInt(this.state.e_hr) !== 0 || parseInt(this.state.e_min) !== 0) ? (
                     <Button variant="info" size="lg" className="mt-3" onClick={this.sendImage}>Analyze</Button>

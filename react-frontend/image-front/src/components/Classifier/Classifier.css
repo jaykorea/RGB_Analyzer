@@ -1,3 +1,9 @@
+@media (max-width: 576px) {
+  .col-sm-2 {
+    width: 30%;
+  }
+}
+
 .back{
     background: #f8f8f8;
     border: 3px dashed #f0f0f0;
