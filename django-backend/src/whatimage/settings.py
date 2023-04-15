@@ -28,9 +28,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '&8z6ktex^3od!-h^=(2real)&i2uz1phy_o95kbl2yxlazge+p'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['www.zeroexposure1905.com', '127.0.0.1']
+if DEBUG == True:
+    ALLOWED_HOSTS = ['*']
+else:
+    ALLOWED_HOSTS = ['www.zeroexposure1905.com', '127.0.0.1']
 
 
 # Application definition
@@ -51,8 +54,11 @@ INSTALLED_APPS = [
     'corsheaders',
 ]
 
-#CORS_ORIGIN_ALLOW_ALL = True
-CORS_ORIGIN_WHITELIST = ['http://127.0.0.1:8001', 'http://localhost:8001', 'http://www.zeroexposure1905.com', 'https://www.zeroexposure1905.com']
+if DEBUG == True:
+    CORS_ORIGIN_ALLOW_ALL = True
+else:
+    CORS_ORIGIN_WHITELIST = ['http://127.0.0.1:8001', 'http://localhost:8001', 'http://www.zeroexposure1905.com', 'https://www.zeroexposure1905.com']
+    
 CORS_ALLOW_CREDENTIALS = True
 
 # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

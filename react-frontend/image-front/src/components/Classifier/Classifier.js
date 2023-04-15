@@ -5,47 +5,35 @@ import { Alert, Button, Image, Spinner, Form, FormControl, ProgressBar } from 'r
 import axios from 'axios'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-
-export function getIPv4Address(hostname) {
-    let ip = "";
-    const pattern = /^\d+\.\d+\.\d+\.\d+$/;
-    if (hostname.match(pattern)) {
-        ip = hostname;
-    } else {
-        const regex = /(\d+\.\d+\.\d+\.\d+)/gm;
-        const match = regex.exec(hostname);
-        if (match && match.length > 1) {
-            ip = match[1];
-        }
-    }
-    return ip;
-}
-
-export function getEth0IPAddress() {
-  return axios.get('/api/get_eth0_ip/')
-    .then(response => {
-      return response.data.eth0_ip; // change 'ip_address' to 'eth0_ip'
-    })
-    .catch(error => {
-      console.log(error);
-    });
-}
-
+import { getReqUrlAddress } from '../GetUrl/GetUrl';
 
 class Classifier extends Component {
-    state = {
+  constructor(props) {
+    super(props);  
+    this.state = {
         files: [],
         isLoading: false,
         isAnalyzing: false,
         recentImage: null,
+        previewImage: null,
         e_hr: '', // add state variable for e_hr
         e_min: '', // add state variable for e_min
         showMessage: false,
         isMultipleimages: false,
         showProcessedImage: false,
         analyzedInfo: null,
+        dropzoneDimensions: {
+          width: 0,
+          height: 0,
+        },
+      };
+      this.dropzoneRef = React.createRef();
     }
-
+    componentDidMount() {
+      // Update the dimensions of the dropzone box
+      const { width, height } = this.dropzoneRef.current.getBoundingClientRect();
+      this.setState({ dropzoneDimensions: { width, height } });
+    }
     // event handler for e_hr input field
     handleEhrChange = (event) => {
         this.setState({ e_hr: event.target.value });
@@ -65,6 +53,7 @@ class Classifier extends Component {
             isLoading: true,
             files: [],
             recentImage: null,
+            previewImage: files[0],
             isMultipleimages: false, // Reset the state when a single image is uploaded
         })
         this.loadingImage(files)
@@ -122,8 +111,8 @@ class Classifier extends Component {
       formData.append('image', this.state.files[0], this.state.files[0].name);
       formData.append('e_hr', this.state.e_hr); // add e_hr data to FormData
       formData.append('e_min', this.state.e_min); // add e_min data to FormData
-      getEth0IPAddress().then(ipAddress => {
-        axios.post(`https://www.zeroexposure1905.com/api/images/`, formData, {
+      getReqUrlAddress().then(ipAddress => {
+        axios.post(`${ipAddress}/api/images/`, formData, {
           headers: {
             'accept': 'application/json',
             'content-type': 'multipart/form-data',
@@ -140,8 +129,8 @@ class Classifier extends Component {
     }
     
     getImageResults = (object) => {
-      getEth0IPAddress().then(ipAddress => {
-        axios.get(`https://www.zeroexposure1905.com/api/images/${object.data.id}/`, {
+      getReqUrlAddress().then(ipAddress => {
+        axios.get(`${ipAddress}/api/images/${object.data.id}/`, {
           headers: {
             'accept': 'application/json',
           },
@@ -158,8 +147,8 @@ class Classifier extends Component {
     }
     
     showProcessedImage = async () => {
-      const ipAddress = await getEth0IPAddress();
-      axios.get(`https://www.zeroexposure1905.com${this.state.recentImage.data.processed_image}`, {
+      const ipAddress = await getReqUrlAddress();
+      axios.get(`${ipAddress}${this.state.recentImage.data.processed_image}`, {
         headers: {
           'accept': 'image/png, image/jpeg',
         },
@@ -181,72 +170,92 @@ class Classifier extends Component {
         this.setState({ showProcessedImage: false });
     }
 
-
-
     render() {
-        // console.log('e_hr :' + this.state.e_hr)
-        // console.log('e_min :' + this.state.e_min)
-        const files = this.state.files.map(file => (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <li key={file.name} style={{ margin: 'auto' }}>
-              {file.name} - {file.size} bytes
-            </li>
+      const { dropzoneDimensions } = this.state;
+      let imageBoxStyle = {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        height: '300px',
+        border: '2px dashed #ccc',
+      };
+      let imageStyle = {
+        maxWidth: dropzoneDimensions.width,
+        maxHeight: dropzoneDimensions.height,
+        objectFit: 'contain',
+      };
+    
+      const files = this.state.files.map((file) => (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <li key={file.name} style={{ margin: 'auto' }}>
+            {file.name} - {file.size} bytes
+          </li>
+        </div>
+      ));
+    
+      return (
+    <React.Fragment>
+      {this.state.recentImage === null && (
+        <div ref={this.dropzoneRef} style={imageBoxStyle}>
+          <div className="image-preview" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+            {this.state.previewImage ? (
+              <img src={URL.createObjectURL(this.state.previewImage)} alt="" style={imageStyle} />
+            ) : (
+              <Dropzone onDrop={this.onDrop} accept="image/png, image/jpeg">
+                {({ isDragActive, getRootProps, getInputProps }) => (
+                  <div {...getRootProps({ className: 'dropzone back' })} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                    <input {...getInputProps()} />
+                    <i className="far fa-images mb-2 text-muted" style={{ fontSize: 100 }}></i>
+                    <p className="text-muted">{isDragActive ? 'Drop some images' : "Drag 'n' drop some files here, or click to select files"}</p>
+                  </div>
+                )}
+              </Dropzone>
+            )}
           </div>
-        ));
-
-        return (
-            <Dropzone onDrop={this.onDrop} accept='image/png, image/jpeg'>
-            {({ isDragActive, getRootProps, getInputProps }) => (
-              <section className="container">
-                <div {...getRootProps({ className: 'dropzone back' })} style={{display: 'flex', flexDirection: 'column', justifyContent: 'center',alignItems: 'center'}}>
-                  <input {...getInputProps()} />
-                  <i className="far fa-images mb-2 text-muted" style={{ fontSize: 100 }}></i>
-                  <p className='text-muted'>{isDragActive ? "Drop some images" : "Drag 'n' drop some files here, or click to select files"}</p>
-                </div>
-                <aside>
-                  {files}
-                </aside>
-                <Form>
-                  {this.state.recentImage ? null : ( // Add this line to conditionally render the Form component
-                    <React.Fragment>
-                      <div className="row" style={{marginTop: '5px'}}>
-                        <label for="exposure_hour" className="col-sm-2 col-form-label">
-                          Exposure Hour
-                        </label>
-                        <div className="col-sm-10">
-                          <input
-                            type="number"
-                            className="form-control"
-                            placeholder="Enter the expected exposure time"
-                            id="exposure_hour"
-                            name="e_hr"
-                            value={this.state.e_hr}
-                            onChange={this.handleEhrChange}
-                            min="0"
-                          ></input>
-                        </div>
-                      </div>
-
-                      <div className="row">
-                        <label for="exposure_min" className="col-sm-2 col-form-label">
-                          Exposure Minute
-                        </label>
-                        <div className="col-sm-10">
-                          <input
-                            type="number"
-                            className="form-control"
-                            placeholder="Enter the expected exposure time"
-                            id="exposure_min"
-                            name="e_min"
-                            value={this.state.e_min}
-                            onChange={this.handleEminChange}
-                            min="0"
-                          ></input>
-                        </div>
-                      </div>
-                    </React.Fragment>
-                  )}
-                </Form>
+        </div>
+      )}
+<label htmlFor="exposure_time" className="col-form-label">
+  Exposure Time
+</label>
+<Form>
+  {this.state.recentImage ? null : (
+    <React.Fragment>
+      <div className="row justify-content-center" style={{ marginTop: '5px' }}>
+        <div className="col-sm-3">
+          <input
+            type="number"
+            className="form-control"
+            placeholder=""
+            id="exposure_hour"
+            name="e_hr"
+            value={this.state.e_hr}
+            onChange={this.handleEhrChange}
+            min="0"
+          />
+        </div>
+        <label htmlFor="exposure_hour" className="col-form-label">
+          h
+        </label>
+        <div className="col-sm-3">
+          <input
+            type="number"
+            className="form-control"
+            placeholder=""
+            id="exposure_min"
+            name="e_min"
+            value={this.state.e_min}
+            onChange={this.handleEminChange}
+            min="0"
+          />
+        </div>
+        <label htmlFor="exposure_min" className="col-form-label">
+          m
+        </label>
+      </div>
+    </React.Fragment>
+  )}
+</Form>
                 {this.state.files.length > 0 && (
                   (this.state.e_hr !== "" && this.state.e_min !== "")  && (parseInt(this.state.e_hr) >= 0 && parseInt(this.state.e_min) >= 0) && (parseInt(this.state.e_hr) !== 0 || parseInt(this.state.e_min) !== 0) ? (
                     <Button variant="info" size="lg" className="mt-3" onClick={this.sendImage}>Analyze</Button>
@@ -311,50 +320,50 @@ class Classifier extends Component {
                           </CircularProgressbar>
                         </div>
                     }
-                    <div className="image-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '20px' }}>
-                      {this.state.recentImage && (
-                        <React.Fragment>
-                          {this.state.showProcessedImage ? (
-                            <React.Fragment>                      
-                              <Button style={{ marginTop: '0px', marginBottom: '30px', fontSize: '15px', width: '220px', height: '40px' }} variant="primary" size="lg" className="mt-3 mx-auto" onClick={this.hideProcessedImage}>Hide Processed Image</Button>
-                              <div style={{border: '2px solid #ccc', borderRadius: '4px',padding: '3px',marginTop: '0px', marginBottom: '30px'}}>
-                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}><b style={{ color: 'gray' ,fontStyle: 'italic'}}>Processed Data</b>
-                                  <Image
-                                    className='justify-content-center'
-                                    src={this.state.recentImage.data.processed_image}
-                                    height='300'
-                                    alt="File not Loaded"
-                                    rounded
-                                    align="center"
-                                    style={{ marginTop: '0px', marginBottom: '7px' }}
-                                  />
-                                  <div className="analyzed-info-container">
-                                      {this.state.analyzedInfo && (
-                                        <div className="analyzed-info auto-line-break" style={{ marginBottom: '0px !important' }}>
-                                          <b style={{ color: 'gray' ,fontStyle: 'italic'}}><p>{this.state.analyzedInfo}</p></b>
-                                        </div>
-                                      )}
-                                  </div>
-                                </div>
-                              </div>
-                            </React.Fragment>
-                          ) : (
-                            <Button style={{ marginTop: '0px', marginBottom: '30px', fontSize: '15px', width: '220px', height: '40px' }} variant="primary" size="lg" className="mt-3 mx-auto" onClick={this.showProcessedImage}>Show Processed Image</Button>
-                          )}
-                        </React.Fragment>
-                      )}
-                    </div>
-                      </React.Fragment>
+                  </React.Fragment>
                     }
-              </section>
-            )}
-          </Dropzone>
+          </React.Fragment>
         );
       }
 }
 
 export default Classifier;
 
+
+// <div className="image-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '20px' }}>
+// {this.state.recentImage && (
+//   <React.Fragment>
+//     {this.state.showProcessedImage ? (
+//       <React.Fragment>                      
+//         <Button style={{ marginTop: '0px', marginBottom: '30px', fontSize: '15px', width: '220px', height: '40px' }} variant="primary" size="lg" className="mt-3 mx-auto" onClick={this.hideProcessedImage}>Hide Processed Image</Button>
+//         <div style={{border: '2px solid #ccc', borderRadius: '4px',padding: '3px',marginTop: '0px', marginBottom: '30px'}}>
+//           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}><b style={{ color: 'gray' ,fontStyle: 'italic'}}>Processed Data</b>
+//             <Image
+//               className='justify-content-center'
+//               src={this.state.recentImage.data.processed_image}
+//               height='300'
+//               alt="File not Loaded"
+//               rounded
+//               align="center"
+//               style={{ marginTop: '0px', marginBottom: '7px' }}
+//             />
+//             <div className="analyzed-info-container">
+//                 {this.state.analyzedInfo && (
+//                   <div className="analyzed-info auto-line-break" style={{ marginBottom: '0px !important' }}>
+//                     <b style={{ color: 'gray' ,fontStyle: 'italic'}}><p>{this.state.analyzedInfo}</p></b>
+//                   </div>
+//                 )}
+//             </div>
+//           </div>
+//         </div>
+//       </React.Fragment>
+//     ) : (
+//       <Button style={{ marginTop: '0px', marginBottom: '30px', fontSize: '15px', width: '220px', height: '40px' }} variant="primary" size="lg" className="mt-3 mx-auto" onClick={this.showProcessedImage}>Show Processed Image</Button>
+//     )}
+//   </React.Fragment>
+// )}
+// </div> 
+// show process image part
 
 // This error is caused by running out of the inotify watches limit. You can fix it by increasing the inotify limit.
 

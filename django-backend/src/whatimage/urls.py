@@ -22,9 +22,14 @@ from django.views.static import serve
 from django.conf.urls import url
 from . import views
 
+if settings.DEBUG == True:
+    api_req_url = views.get_req_local_url
+else:
+    api_req_url = views.get_req_dns_url
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/get_eth0_ip/', views.get_eth0_ip, name='get_eth0_ip'),
+    path('api/get_req_url/', api_req_url, name='get_req_url'),
     path('api/', include('images.api.urls', namespace='api-images')),
     # path('api-auth/', include('rest_framework.urls')),
     url(r'^media/(?P<path>.*)$', serve, {'document_root':settings.MEDIA_ROOT}),

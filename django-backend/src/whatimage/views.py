@@ -3,11 +3,20 @@ import socket
 import fcntl
 import struct
 
-def get_eth0_ip(request):
+network_interface_name = b'ens259f1'
+
+def get_req_public_url(request):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    eth0_ip = socket.inet_ntoa(fcntl.ioctl(
+    req_url = socket.inet_ntoa(fcntl.ioctl(
         s.fileno(),
         0x8915,  # SIOCGIFADDR
-        struct.pack('256s', b'eth0') # Note: use b'eth0' instead of 'eth0'
+        struct.pack('256s', network_interface_name) # Note: use b'eth0' instead of 'eth0'
     )[20:24])
-    return JsonResponse({'eth0_ip': eth0_ip})
+    req_url= 'http://'+req_url+':8001'
+    return JsonResponse({'req_url': req_url})
+
+def get_req_local_url(requset):
+    return JsonResponse({'req_url': 'http://127.0.0.1:8001'})
+
+def get_req_dns_url(request):
+    return JsonResponse({'req_url': 'https://www.zeroexposure1905.com'})

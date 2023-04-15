@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import Image from './Image';
 import { Button, Spinner } from 'react-bootstrap'
-import { getEth0IPAddress } from '../Classifier/Classifier.js';
+import { getReqUrlAddress } from '../GetUrl/GetUrl.js';
 import { alignPropType } from 'react-bootstrap/esm/DropdownMenu';
 
 class ImageList extends Component {
@@ -19,14 +19,15 @@ class ImageList extends Component {
     }
 
     getImages = () => {
-        getEth0IPAddress().then(ipAddress => {
-            axios.get(`https://www.zeroexposure1905.com/api/images/`, {
+        getReqUrlAddress().then(ipAddress => {
+            axios.get(`${ipAddress}/api/images/`, {
                 headers: {
                     'accept': 'application/json'
                 }
             }).then(resp => {
                 this.setState({
                     images: resp.data,
+                    analyzedInfo: resp.data.analyzed_info,
                     status: true
                 })
                 console.log(resp)
@@ -48,9 +49,11 @@ class ImageList extends Component {
     }
 
     render() {
-        const images = this.state.images.slice(0, this.state.visible).map(img => {
-            return <Image key={img.id} pict={img.processed_image} name={img.analyzed}/>
-        })
+        const images = this.state.images.slice(0, this.state.visible).map((img, index) => {
+            return <Image key={img.id} pict={img.processed_image} name={img.analyzed} analyzedInfo={img.analyzed_info} id={index + 1} />
+        });
+
+
         return (
             <div>
                 <h3> Analysis of images</h3>
@@ -78,5 +81,6 @@ class ImageList extends Component {
 }
 
 export default ImageList;
+
 
 

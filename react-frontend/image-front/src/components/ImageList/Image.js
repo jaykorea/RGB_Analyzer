@@ -1,17 +1,29 @@
 import React from 'react';
-import { Card } from 'react-bootstrap';
 
 const Image = (props) => {
     return (
-        <Card style={{ width: '20rem' }} className="mx-auto mb-1">
-            <Card.Img variant="top" src={props.pict} />
-            <Card.Body>
-                <Card.Title>
-                    Analyzed as<br/>
-                </Card.Title>
-                <div className="auto-line-break analyzed-results">{props.name}</div>
-            </Card.Body>
-        </Card>
+        <div className="image-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '10px' }}>
+            <div style={{border: '2px solid #ccc', borderRadius: '4px',padding: '3px',marginTop: '0px', marginBottom: '3px'}}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <b style={{ color: 'gray' ,fontStyle: 'italic'}}>Processed  Image Data #{props.id}</b>
+                    <img
+                        className='justify-content-center'
+                        src={props.pict}
+                        height='300'
+                        rounded
+                        align="center"
+                        style={{ marginTop: '0px', marginBottom: '7px' }}
+                    />
+                    <div className="analyzed-info-container">
+                        {props.analyzedInfo && (
+                            <div className="analyzed-info auto-line-break" style={{ marginBottom: '0px !important' }}>
+                                <b style={{ color: 'gray' ,fontStyle: 'italic'}}><p>{props.analyzedInfo}</p></b>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 }
 export default Image;
