@@ -191,7 +191,7 @@ class Classifier extends Component {
         justifyContent: 'center',
         alignItems: 'center',
         minHeight: '330px',
-        marginBottom: '25px',
+        marginBottom: '15px',
       };
       let imageStyle = {
         maxWidth: `${dropzoneDimensions.width * 0.99}px`,
@@ -257,7 +257,7 @@ class Classifier extends Component {
                   />
                 </div>
                 <label htmlFor="exposure_hour" className="col-form-label">
-                  h
+                  hr
                 </label>
                 <div className="col-sm-2 col-md-4">
                   <input
@@ -273,7 +273,7 @@ class Classifier extends Component {
                   />
                 </div>
                 <label htmlFor="exposure_min" className="col-form-label">
-                  m
+                  min
                 </label>
               </div>
                   </React.Fragment>
