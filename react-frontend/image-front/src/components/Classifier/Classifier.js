@@ -272,7 +272,7 @@ class Classifier extends Component {
                     style={{ width: '100%' }}
                   />
                 </div>
-                <label htmlFor="exposure_min" className="col-form-label">
+                <label htmlFor="exposure_min" className="col-form-label" >
                   min
                 </label>
               </div>
@@ -282,9 +282,9 @@ class Classifier extends Component {
 
                 {this.state.files.length > 0 && (
                   (this.state.e_hr !== "" && this.state.e_min !== "")  && (parseInt(this.state.e_hr) >= 0 && parseInt(this.state.e_min) >= 0) && (parseInt(this.state.e_hr) !== 0 || parseInt(this.state.e_min) !== 0) ? (
-                    <Button variant="info" size="lg" className="mt-3" onClick={this.sendImage}>Analyze</Button>
+                    <Button variant="info" size="lg" className="analyze-button" onClick={this.sendImage}>Analyze</Button>
                   ) : (
-                    <Button variant="info" size="lg" className="mt-3" onClick={this.handleDisabledClick}>Analyze</Button>
+                    <Button variant="info" size="lg" className="analyze-button" onClick={this.handleDisabledClick}>Analyze</Button>
                   )
                 )}
                 {this.state.showMessage && (this.state.e_hr === "" || this.state.e_min === "") &&
@@ -313,21 +313,8 @@ class Classifier extends Component {
                 }
                 {this.state.recentImage &&
                   <React.Fragment>
-                    {this.state.recentImage.data.analyzed.includes('Failed') && 
-                        <Alert variant='warning' style={{ marginTop: '12px'}}>
-                            <div className="auto-line-break analyzed-results">{this.state.recentImage.data.analyzed}</div>
-                        </Alert>
-                    }
-                    {!this.state.recentImage.data.analyzed.includes('Failed') && Number(this.state.recentImage.data.analyzed) <= 100 ? (
-                        <Alert variant='primary' style={{ marginTop: '12px'}}>
-                            <div className="auto-line-break analyzed-results">Ozone exposure level<br></br><b>{Math.round(this.state.recentImage.data.analyzed)}</b> ppb</div>
-                        </Alert>
-                    ) : !this.state.recentImage.data.analyzed.includes('Failed') && (
-                        <Alert variant='danger' style={{ marginTop: '12px'}}>
-                            <div className="auto-line-break analyzed-results">Ozone exposure level<br></br> <b>{Math.round(this.state.recentImage.data.analyzed)}</b> ppb</div>
-                        </Alert>
-                    )}
                     {!this.state.recentImage.data.analyzed.includes('Failed') && 
+                      <div className="circular-progress-container">
                         <div className="circular-progress-bar" style={{marginTop: '13px !important'}}>
                           <CircularProgressbar
                             value={Number(this.state.recentImage.data.analyzed)}
@@ -343,7 +330,22 @@ class Classifier extends Component {
                           >
                           </CircularProgressbar>
                         </div>
+                      </div>
                     }
+                    {this.state.recentImage.data.analyzed.includes('Failed') && 
+                        <Alert variant='warning' style={{ marginTop: '50px'}}>
+                            <div className="auto-line-break analyzed-results">{this.state.recentImage.data.analyzed}</div>
+                        </Alert>
+                    }
+                    {!this.state.recentImage.data.analyzed.includes('Failed') && Number(this.state.recentImage.data.analyzed) <= 100 ? (
+                        <Alert variant='primary' style={{ marginTop: '50px'}}>
+                            <div className="auto-line-break analyzed-results">Ozone exposure level<br></br><b>{Math.round(this.state.recentImage.data.analyzed)}</b> ppb</div>
+                        </Alert>
+                    ) : !this.state.recentImage.data.analyzed.includes('Failed') && (
+                        <Alert variant='danger' style={{ marginTop: '50px'}}>
+                            <div className="auto-line-break analyzed-results">Ozone exposure level<br></br> <b>{Math.round(this.state.recentImage.data.analyzed)}</b> ppb</div>
+                        </Alert>
+                    )}
                   </React.Fragment>
                     }
           </React.Fragment>
