@@ -279,6 +279,7 @@ class SampleDetector:
             result_analyzed.append("Failed to analyze")
         print(EA_sub_b, PPB)
         result_analyzed_info=debug_avg_color
+        result_analyzed_info.append("PPB : %.4f" %(PPB))
         result_analyzed_info.append("Exposure time : %.1fhr" %(e_T))
         output_dic={"image": input_image, "result_analyzed": result_analyzed, 'result_analyzed_info': result_analyzed_info}
         # output_arr.append(input_image)
