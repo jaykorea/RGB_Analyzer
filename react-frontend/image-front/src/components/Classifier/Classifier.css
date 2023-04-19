@@ -1,3 +1,9 @@
+html,
+body{
+width:100%;
+overflow-x:hidden;
+}
+
 @media (max-width: 576px) {
   .col-sm-2 {
     width: 25%;
@@ -26,10 +32,6 @@
 
 .back:hover{
     border:3px dashed skyblue;
-}
-
-body, html {
-  height: 100%;
 }
 
 .circular-progress-container {
