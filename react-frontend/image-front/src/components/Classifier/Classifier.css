@@ -1,8 +1,3 @@
-html,
-body{
-  width: 100%;
-  overflow-x: hidden;
-}
 @media (max-width: 576px) {
   .col-sm-2 {
     width: 25%;
@@ -18,6 +13,15 @@ body{
     padding: 75px 5px;
     outline: none;
     cursor: pointer;
+}
+
+.dashed-box {
+  border: 2px dashed hsl(0, 0%, 91%); /* Adjust the color and thickness of the border as needed */
+  padding: 10px; /* Add some padding to create space between the border and the form */
+}
+
+.custom-alert {
+  border: none;
 }
 
 .back:hover{
@@ -42,7 +46,7 @@ body, html {
     width: 280px;
     height: 280px;
     margin: 0 auto; /* Center the element horizontally */
-    margin-top: 40px;
+    margin-top: 100px;
     margin-bottom: 0px;
   }
 
@@ -87,5 +91,5 @@ body, html {
 }
 
 .analyze-button {
-  margin-top: 45px; /* Adjust this value to the desired margin size */
+  margin-top: 35px; /* Adjust this value to the desired margin size */
 }

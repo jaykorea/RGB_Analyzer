@@ -26,6 +26,7 @@ class Image(models.Model):
     BASE_PATH = os.path.dirname(os.path.abspath(__file__))
     ROOT_PATH = Path(BASE_PATH).parent.parent
     MEDIA_ROOT = settings.MEDIA_ROOT
+    
     def __str__(self):
         return "Image analyzed at {}".format(self.uploaded_time.strftime("%Y-%m-%d %H:%M"))
 

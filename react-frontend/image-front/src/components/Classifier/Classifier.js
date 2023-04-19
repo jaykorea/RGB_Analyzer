@@ -279,7 +279,6 @@ class Classifier extends Component {
                   </React.Fragment>
                 )}
               </Form>
-
                 {this.state.files.length > 0 && (
                   (this.state.e_hr !== "" && this.state.e_min !== "")  && (parseInt(this.state.e_hr) >= 0 && parseInt(this.state.e_min) >= 0) && (parseInt(this.state.e_hr) !== 0 || parseInt(this.state.e_min) !== 0) ? (
                     <Button variant="info" size="lg" className="analyze-button" onClick={this.sendImage}>Analyze</Button>
@@ -319,12 +318,12 @@ class Classifier extends Component {
                           <CircularProgressbar
                             value={Number(this.state.recentImage.data.analyzed)}
                             text={
-                              Number(this.state.recentImage.data.analyzed) <= 100 ? 'SAFE' : 'DANGER'
+                              Number(this.state.recentImage.data.analyzed)*(8.0/(Number.parseFloat(this.state.recentImage.data.e_hr)+(Number.parseFloat(this.state.recentImage.data.e_min)*0.166667))) <= 100.0 ? 'SAFE' : 'DANGER'
                             }
                             styles={buildStyles({
                               fontSize: '14px',
-                              textColor: Number(this.state.recentImage.data.analyzed) <= 100 ? '#007bff' : '#dc3545',
-                              pathColor: Number(this.state.recentImage.data.analyzed) <= 100 ? '#007bff' : '#dc3545',
+                              textColor: Number(this.state.recentImage.data.analyzed)*(8.0/(Number.parseFloat(this.state.recentImage.data.e_hr)+(Number.parseFloat(this.state.recentImage.data.e_min)*0.166667))) <= 100.0 ? '#007bff' : '#dc3545',
+                              pathColor: Number(this.state.recentImage.data.analyzed)*(8.0/(Number.parseFloat(this.state.recentImage.data.e_hr)+(Number.parseFloat(this.state.recentImage.data.e_min)*0.166667))) <= 100.0 ? '#007bff' : '#dc3545',
                               trailColor: '#f2f2f2',
                             })}
                           >
@@ -337,12 +336,12 @@ class Classifier extends Component {
                             <div className="auto-line-break analyzed-results">{this.state.recentImage.data.analyzed}</div>
                         </Alert>
                     }
-                    {!this.state.recentImage.data.analyzed.includes('Failed') && Number(this.state.recentImage.data.analyzed) <= 100 ? (
-                        <Alert variant='primary' style={{ marginTop: '50px'}}>
+                    {!this.state.recentImage.data.analyzed.includes('Failed') && Number(this.state.recentImage.data.analyzed)*(8.0/(Number.parseFloat(this.state.recentImage.data.e_hr)+(Number.parseFloat(this.state.recentImage.data.e_min)*0.166667))) <= 100.0 ? (
+                        <Alert variant='primary' className="custom-alert" style={{ marginTop: '40px'}}>
                             <div className="auto-line-break analyzed-results">Ozone exposure level<br></br><b>{Math.round(this.state.recentImage.data.analyzed)}</b> ppb</div>
                         </Alert>
                     ) : !this.state.recentImage.data.analyzed.includes('Failed') && (
-                        <Alert variant='danger' style={{ marginTop: '50px'}}>
+                        <Alert variant='danger' className="custom-alert" style={{ marginTop: '40px'}}>
                             <div className="auto-line-break analyzed-results">Ozone exposure level<br></br> <b>{Math.round(this.state.recentImage.data.analyzed)}</b> ppb</div>
                         </Alert>
                     )}
