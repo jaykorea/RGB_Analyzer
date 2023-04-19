@@ -274,10 +274,10 @@ class SampleDetector:
         S_TWA = O_sub_3
         
         if S_TWA > 0 :
-            result_analyzed.append(str(S_TWA))
+            result_analyzed.append(str(PPB))
         else:
             result_analyzed.append("Failed to analyze")
-        print(EA_sub_b, S_TWA)
+        print(EA_sub_b, PPB)
         result_analyzed_info=debug_avg_color
         result_analyzed_info.append("Exposure time : %.1fhr" %(e_T))
         output_dic={"image": input_image, "result_analyzed": result_analyzed, 'result_analyzed_info': result_analyzed_info}

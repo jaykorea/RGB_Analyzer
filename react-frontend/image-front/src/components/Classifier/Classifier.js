@@ -318,12 +318,12 @@ class Classifier extends Component {
                           <CircularProgressbar
                             value={Number(this.state.recentImage.data.analyzed)}
                             text={
-                              Number(this.state.recentImage.data.analyzed)*(8.0/(Number.parseFloat(this.state.recentImage.data.e_hr)+(Number.parseFloat(this.state.recentImage.data.e_min)*0.166667))) <= 100.0 ? 'SAFE' : 'DANGER'
+                              Number(this.state.recentImage.data.analyzed)*((Number.parseFloat(this.state.recentImage.data.e_hr)+(Number.parseFloat(this.state.recentImage.data.e_min)*0.166667))/8.0) <= 100.0 ? 'SAFE' : 'DANGER'
                             }
                             styles={buildStyles({
                               fontSize: '14px',
-                              textColor: Number(this.state.recentImage.data.analyzed)*(8.0/(Number.parseFloat(this.state.recentImage.data.e_hr)+(Number.parseFloat(this.state.recentImage.data.e_min)*0.166667))) <= 100.0 ? '#007bff' : '#dc3545',
-                              pathColor: Number(this.state.recentImage.data.analyzed)*(8.0/(Number.parseFloat(this.state.recentImage.data.e_hr)+(Number.parseFloat(this.state.recentImage.data.e_min)*0.166667))) <= 100.0 ? '#007bff' : '#dc3545',
+                              textColor: Number(this.state.recentImage.data.analyzed)*((Number.parseFloat(this.state.recentImage.data.e_hr)+(Number.parseFloat(this.state.recentImage.data.e_min)*0.166667))/8.0) <= 100.0 ? '#007bff' : '#dc3545',
+                              pathColor: Number(this.state.recentImage.data.analyzed)*((Number.parseFloat(this.state.recentImage.data.e_hr)+(Number.parseFloat(this.state.recentImage.data.e_min)*0.166667))/8.0) <= 100.0 ? '#007bff' : '#dc3545',
                               trailColor: '#f2f2f2',
                             })}
                           >
@@ -336,7 +336,7 @@ class Classifier extends Component {
                             <div className="auto-line-break analyzed-results">{this.state.recentImage.data.analyzed}</div>
                         </Alert>
                     }
-                    {!this.state.recentImage.data.analyzed.includes('Failed') && Number(this.state.recentImage.data.analyzed)*(8.0/(Number.parseFloat(this.state.recentImage.data.e_hr)+(Number.parseFloat(this.state.recentImage.data.e_min)*0.166667))) <= 100.0 ? (
+                    {!this.state.recentImage.data.analyzed.includes('Failed') && Number(this.state.recentImage.data.analyzed)*((Number.parseFloat(this.state.recentImage.data.e_hr)+(Number.parseFloat(this.state.recentImage.data.e_min)*0.166667))/8.0) <= 100.0 ? (
                         <Alert variant='primary' className="custom-alert" style={{ marginTop: '40px'}}>
                             <div className="auto-line-break analyzed-results">Ozone exposure level<br></br><b>{Math.round(this.state.recentImage.data.analyzed)}</b> ppb</div>
                         </Alert>
