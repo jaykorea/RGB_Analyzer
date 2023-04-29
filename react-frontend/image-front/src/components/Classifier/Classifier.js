@@ -143,7 +143,7 @@ class Classifier extends Component {
           this.calculateLabelPositions();
           this.setState({ prevZoomLevel: currentZoomLevel });
         }
-      }, 100); // Check every 500ms
+      }, 50); // Check every 500ms
 
       // Add a resize event listener to the window
       window.addEventListener('resize', this.handleResize);
@@ -517,7 +517,7 @@ class Classifier extends Component {
                                 arcWidth={0.35}
                                 marginInPercent={0.035}
                                 hideText={true}
-                                animate={true}
+                                animate={false}
                                 animDelay={500}
                                 animateDuration={1000}
                                 formatTextValue={(value) => {
