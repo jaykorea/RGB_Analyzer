@@ -63,7 +63,7 @@ class Classifier extends Component {
       const tickLabelPositions = tickAngles.map((angle) => {
         const radius_t = (radius)*1.36;
         const centerX_t = (centerX)*0.97;
-        const centerY_y = (centerY)*0.4;
+        const centerY_y = (centerY)*0.44;
         const radians = (angle * Math.PI) / 180;
         const x = centerX_t + (radius_t) * Math.cos(radians) ;
         const y = centerY_y + (radius_t) * Math.sin(radians);
@@ -510,7 +510,7 @@ class Classifier extends Component {
                                 arcsLength={[0.166, 0.166, 0.166, 0.166, 0.166, 0.166]}
                                 percent={this.getAQIPercent(Number.parseFloat(this.state.recentImage.data.analyzed))}
                                 textColor="#000000"
-                                needleColor="#e4e4e4"
+                                needleColor="#d7d7d7"
                                 needleBaseColor="#d7d7d7"
                                 arcPadding={0.01}
                                 cornerRadius={0.5}
