@@ -130,36 +130,36 @@ overflow-x:hidden;
 
 
 .aqi-gauge-label-0 {
-  font-size: small;
+  font-size: x-small;
   color: #000;
 }
 
 .aqi-gauge-label-1 {
-  font-size: small;
+  font-size: x-small;
   transform: translateX(-20%) translateY(-40%);
   color: #000;
 }
 
 .aqi-gauge-label-2 {
-  font-size: 12px;
+  font-size: x-small;
   transform: translateX(-28%) translateY(-50%);
   color: #000;
 }
 
 .aqi-gauge-label-3 {
-  font-size: small;
+  font-size: x-small;
   transform: translateX(-10%) translateY(-60%);
   color: #ffffff;
 }
 
 .aqi-gauge-label-4 {
-  font-size: small;
+  font-size: x-small;
   transform: translateX(-5%) translateY(-50%);
   color: #fff;
 }
 
 .aqi-gauge-label-5 {
-  font-size: small;
+  font-size: x-small;
   transform: translateX(-4%) translateY(0%);
   color: #fff;
 }
