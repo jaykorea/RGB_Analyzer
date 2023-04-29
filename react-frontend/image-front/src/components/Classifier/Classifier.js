@@ -1,16 +1,20 @@
-import React, { Component } from 'react';
+import React, { Component, forwardRef, useEffect } from 'react';
 import Dropzone from 'react-dropzone';
 import './Classifier.css';
 import { Alert, Button, Image, Spinner, Form, FormControl, ProgressBar } from 'react-bootstrap';
+import GaugeChart from 'react-gauge-chart';
 import axios from 'axios'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { getReqUrlAddress } from '../GetUrl/GetUrl';
+window.process = { ...window.process }
 
 class Classifier extends Component {
+  
   constructor(props) {
     super(props);  
     this.state = {
+        prevZoomLevel: 1,
         files: [],
         isLoading: false,
         isAnalyzing: false,
@@ -21,31 +25,150 @@ class Classifier extends Component {
         showMessage: false,
         isMultipleimages: false,
         showProcessedImage: false,
+        showAQI: false,
         analyzedInfo: null,
         dropzoneDimensions: {
           width: 0,
           height: 0,
         },
+        labelPositions:[],
+        tickLabelPositions:[],
       };
       this.dropzoneRef = React.createRef();
+      this.gaugeWrapperRef = React.createRef();
     }
+
+    calculateZoomLevel() {
+      const zoomLevel = (window.outerWidth / window.screen.width) * (window.innerWidth / window.outerWidth);
+      return zoomLevel;
+    }
+
+    calculateLabelPositions() {
+      const gaugeWrapperRef = this.gaugeWrapperRef.current;
+      if (!gaugeWrapperRef) return;
+    
+      const rect = gaugeWrapperRef.getBoundingClientRect();
+      const centerX = (rect.width / 2.2) ;
+      const centerY = rect.height * 0.89;
+      const radius = centerX * 0.7; // Adjust this value to match the actual gauge chart radius
+    
+      const angles = [-165, -135, -105, -75, -45, -15];
+      const labelPositions = angles.map((angle) => {
+        const radians = (angle * Math.PI) / 180;
+        const x = centerX + radius * Math.cos(radians);
+        const y = centerY + radius * Math.sin(radians);
+        return { x, y };
+      });
+      const tickAngles = [-180, -150, -120, -90, -60, -30, 0];
+      const tickLabelPositions = tickAngles.map((angle) => {
+        const radius_t = (radius)*1.36;
+        const centerX_t = (centerX)*0.97;
+        const centerY_y = (centerY)*0.4;
+        const radians = (angle * Math.PI) / 180;
+        const x = centerX_t + (radius_t) * Math.cos(radians) ;
+        const y = centerY_y + (radius_t) * Math.sin(radians);
+        return { x, y };
+      });
+    
+      this.setState({ labelPositions, tickLabelPositions });
+    }
+
+    getAQILabel(index) {
+
+      const labels = [
+        'Good',
+        'Moderate',
+        <span>
+        Unhealthy for<br />Sensitive<br />Groups
+        </span>,
+        'Unhealthy',
+        <span>
+        Very<br />Unhealthy
+        </span>,
+        'Hazardous',
+      ];
+
+      switch (index) {
+        case 0:
+          return labels[0];
+        case 1:
+          return labels[1];
+        case 2:
+          return labels[2];
+        case 3:
+          return labels[3];
+        case 4:
+          return labels[4];
+        case 5:
+          return labels[5];
+        default:
+          return 'None';
+      }
+    }
+
+    getAQILabelIndex(index) {
+
+      const labels = [
+        '0',
+        '50',
+        '100',
+        '150',
+        '200',
+        '300',
+        '500',
+      ];
+      switch (index) {
+        case 0:
+          return labels[0];
+        case 1:
+          return labels[1];
+        case 2:
+          return labels[2];
+        case 3:
+          return labels[3];
+        case 4:
+          return labels[4];
+        case 5:
+          return labels[5];
+        default:
+          return 'None';
+      }
+    }
+    
     componentDidMount() {
+      // Set up an interval to check for zoom level changes
+      setInterval(() => {
+        const currentZoomLevel = this.calculateZoomLevel();
+        if (currentZoomLevel !== this.state.prevZoomLevel) {
+          this.calculateLabelPositions();
+          this.setState({ prevZoomLevel: currentZoomLevel });
+        }
+      }, 100); // Check every 500ms
+
       // Add a resize event listener to the window
       window.addEventListener('resize', this.handleResize);
       // Get the initial dimensions of the dropzone
       const { width, height } = this.dropzoneRef.current.getBoundingClientRect();
+      // Get the initial label positions
+      this.calculateLabelPositions();
+      window.addEventListener('resize', this.calculateLabelPositions.bind(this));
+
       this.setState({ dropzoneDimensions: { width, height } });
     }
   
     componentWillUnmount() {
       // Remove the resize event listener when the component unmounts
       window.removeEventListener('resize', this.handleResize);
+      // Remove the resize event listener when the component unmounts
+      window.removeEventListener('resize', this.calculateLabelPositions.bind(this));
     }
   
     handleResize = () => {
       // Update the dimensions of the dropzone when the window resizes
-      const { width, height } = this.dropzoneRef.current.getBoundingClientRect();
-      this.setState({ dropzoneDimensions: { width, height } });
+      if (this.dropzoneRef.current) {
+        const { width, height } = this.dropzoneRef.current.getBoundingClientRect();
+        this.setState({ dropzoneDimensions: { width, height } });
+      }
     };
 
     // event handler for e_hr input field
@@ -178,10 +301,38 @@ class Classifier extends Component {
         });
       this.setState({ showProcessedImage: true });
     }
-    
+
+    showAQI = () => {
+      this.setState({ showAQI: true });
+      setTimeout(() => {
+        this.calculateLabelPositions();
+      }, 1);
+  }
+   
+    hideAQI = () => {
+      this.setState({ showAQI: false });
+  }
 
     hideProcessedImage = () => {
         this.setState({ showProcessedImage: false });
+    }
+
+    getAQIPercent(aqiValue) {
+      const equalSegmentRatio = 1 / 6; // 0.166
+    
+      if (aqiValue <= 50) {
+        return aqiValue / 50 * equalSegmentRatio;
+      } else if (aqiValue <= 100) {
+        return equalSegmentRatio + (aqiValue - 50) / 50 * equalSegmentRatio;
+      } else if (aqiValue <= 150) {
+        return equalSegmentRatio * 2 + (aqiValue - 100) / 50 * equalSegmentRatio;
+      } else if (aqiValue <= 200) {
+        return equalSegmentRatio * 3 + (aqiValue - 150) / 50 * equalSegmentRatio;
+      } else if (aqiValue <= 300) {
+        return equalSegmentRatio * 4 + (aqiValue - 200) / 100 * equalSegmentRatio;
+      } else {
+        return equalSegmentRatio * 5 + (aqiValue - 300) / 200 * equalSegmentRatio;
+      }
     }
 
     render() {
@@ -214,7 +365,7 @@ class Classifier extends Component {
           </li>
         </div>
       ));
-    
+      
       return (
     <React.Fragment>
       {this.state.recentImage === null && (
@@ -318,12 +469,12 @@ class Classifier extends Component {
                           <CircularProgressbar
                             value={Number(this.state.recentImage.data.analyzed)}
                             text={
-                              Number(this.state.recentImage.data.analyzed)*((Number.parseFloat(this.state.recentImage.data.e_hr)+(Number.parseFloat(this.state.recentImage.data.e_min)*0.166667))/8.0) <= 100.0 ? 'SAFE' : 'DANGER'
+                              Number(this.state.recentImage.data.analyzed) < 100.0 ? 'SAFE' : 'DANGER'
                             }
                             styles={buildStyles({
                               fontSize: '14px',
-                              textColor: Number(this.state.recentImage.data.analyzed)*((Number.parseFloat(this.state.recentImage.data.e_hr)+(Number.parseFloat(this.state.recentImage.data.e_min)*0.166667))/8.0) <= 100.0 ? '#007bff' : '#dc3545',
-                              pathColor: Number(this.state.recentImage.data.analyzed)*((Number.parseFloat(this.state.recentImage.data.e_hr)+(Number.parseFloat(this.state.recentImage.data.e_min)*0.166667))/8.0) <= 100.0 ? '#007bff' : '#dc3545',
+                              textColor: Number(this.state.recentImage.data.analyzed) < 100.0 ? '#007bff' : '#dc3545',
+                              pathColor: Number(this.state.recentImage.data.analyzed) < 100.0 ? '#007bff' : '#dc3545',
                               trailColor: '#f2f2f2',
                             })}
                           >
@@ -336,7 +487,7 @@ class Classifier extends Component {
                             <div className="auto-line-break analyzed-results">{this.state.recentImage.data.analyzed}</div>
                         </Alert>
                     }
-                    {!this.state.recentImage.data.analyzed.includes('Failed') && Number(this.state.recentImage.data.analyzed)*((Number.parseFloat(this.state.recentImage.data.e_hr)+(Number.parseFloat(this.state.recentImage.data.e_min)*0.166667))/8.0) <= 100.0 ? (
+                    {!this.state.recentImage.data.analyzed.includes('Failed') && Number(this.state.recentImage.data.analyzed) < 100.0 ? (
                         <Alert variant='primary' className="custom-alert" style={{ marginTop: '40px'}}>
                             <div className="auto-line-break analyzed-results">Ozone exposure level<br></br><b>{Math.round(this.state.recentImage.data.analyzed)}</b> ppb</div>
                         </Alert>
@@ -345,6 +496,79 @@ class Classifier extends Component {
                             <div className="auto-line-break analyzed-results">Ozone exposure level<br></br> <b>{Math.round(this.state.recentImage.data.analyzed)}</b> ppb</div>
                         </Alert>
                     )}
+                     {this.state.recentImage && (
+                        <React.Fragment>
+                          {this.state.showAQI ? (
+                            <React.Fragment>                      
+                              <Button style={{ marginTop: '0px', marginBottom: '50px', fontSize: '15px', width: '150px', height: '40px' }} variant="primary" size="lg" className="mt-3 mx-auto" onClick={this.hideAQI}>AQI</Button>
+                              <div ref={this.gaugeWrapperRef}>
+                              <div className="aqi-gauge-container" style={{marginBottom: '40px'}}> 
+                              <GaugeChart
+                                id="gauge-chart"
+                                nrOfLevels={6}
+                                colors={['#00FF00', '#FFFF00', '#FFA500', '#FF4500', '#B70000', '#7C0A02']}
+                                arcsLength={[0.166, 0.166, 0.166, 0.166, 0.166, 0.166]}
+                                percent={this.getAQIPercent(Number.parseFloat(this.state.recentImage.data.analyzed))}
+                                textColor="#000000"
+                                needleColor="#e4e4e4"
+                                needleBaseColor="#d7d7d7"
+                                arcPadding={0.01}
+                                cornerRadius={0.5}
+                                arcWidth={0.35}
+                                marginInPercent={0.035}
+                                hideText={true}
+                                animate={true}
+                                animDelay={500}
+                                animateDuration={1000}
+                                formatTextValue={(value) => {
+                                  console.log('Received value:', value);
+                                  const aqi = Number(this.state.recentImage.data.analyzed);
+                                  if (aqi > 0 && aqi <= 50) return 'Good';
+                                  else if (aqi > 50 && aqi <= 100) return 'Moderate';
+                                  else if (aqi > 100 && aqi <= 150) return 'Unhealthy for Sensitive Groups';
+                                  else if (aqi > 150 && aqi <= 200) return 'Unhealthy';
+                                  else if (aqi > 200 && aqi <= 300) return 'Very Unhealthy';
+                                  else if (aqi > 300 && aqi <= 500) return 'Hazardous';
+                                  else return 'None';
+                                }}
+                              />
+                                <div className="aqi-gauge-labels">
+                                  {this.state.labelPositions.map((position, index) => (
+                                    <div
+                                      key={index}
+                                      className={`aqi-gauge-label aqi-gauge-label-${index}`}
+                                      style={{
+                                        position: 'absolute',
+                                        left: position.x,
+                                        top: position.y,
+                                      }}
+                                    >
+                                      <span>{this.getAQILabel(index)}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                                <div className="aqi-gauge-labels">
+                                  {this.state.tickLabelPositions.map((position, index) => (
+                                    <div
+                                      key={index}
+                                      className={`aqi-gauge-tick-label aqi-gauge-tick-label-${index}`}
+                                      style={{
+                                        transform: `translate(${position.x}px, ${position.y}px)`,
+                                      }}
+                                    >
+                                      <span>{[0, 50, 100, 150, 200, 300, 500][index]}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                            </React.Fragment>
+                          ) : (
+                            <Button style={{ marginTop: '0px', marginBottom: '50px', fontSize: '15px', width: '150px', height: '40px' }} variant="primary" size="lg" className="mt-3 mx-auto" onClick={this.showAQI}>AQI</Button>
+                          )}
+                        </React.Fragment>
+                      )}
+                      
                   </React.Fragment>
                     }
           </React.Fragment>
@@ -354,7 +578,7 @@ class Classifier extends Component {
 
 export default Classifier;
 
-
+// Number(this.state.recentImage.data.analyzed) <- PPB * (T/8)
 // <div className="image-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '20px' }}>
 // {this.state.recentImage && (
 //   <React.Fragment>
