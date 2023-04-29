@@ -142,7 +142,7 @@ overflow-x:hidden;
 
 .aqi-gauge-label-2 {
   font-size: 9px;
-  transform: translateX(-32%) translateY(-50%);
+  transform: translateX(-30%) translateY(-50%);
   color: #000;
 }
 
