@@ -126,21 +126,19 @@ overflow-x:hidden;
 /* Increase the font size for screens larger than iphone 13 */
 @media screen and (min-width: 390px) {
   .aqi-gauge-label {
-    font-size: 10px;
+    font-size: 9px;
   }
 }
 
 /* Increase the font size for screens larger than iphone 14 plus */
 @media screen and (min-width: 428px) {
   .aqi-gauge-label {
-    font-size: 11px;
+    font-size: 10px;
   }
 }
 
-
 .aqi-gauge-label {
   position: flex;
-  font-size: 9px;
   text-align: center;
   font-weight: bold;
   transform-origin: center bottom;
