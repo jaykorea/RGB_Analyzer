@@ -165,7 +165,7 @@ overflow-x:hidden;
 }
 
 .aqi-gauge-label-3 {
-  transform: translateX(-2%) translateY(-60%);
+  transform: translateX(-5%) translateY(-60%);
   color: #ffffff;
 }
 
@@ -175,7 +175,7 @@ overflow-x:hidden;
 }
 
 .aqi-gauge-label-5 {
-  transform: translateX(0%) translateY(0%);
+  transform: translateX(-2%) translateY(0%);
   color: #fff;
 }
 
