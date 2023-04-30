@@ -116,8 +116,31 @@ overflow-x:hidden;
   pointer-events: none;
 }
 
+/* Increase the font size for screens larger than iphone 13 mini */
+@media screen and (min-width: 360px) {
+  .aqi-gauge-label {
+    font-size: 8px;
+  }
+}
+
+/* Increase the font size for screens larger than iphone 13 */
+@media screen and (min-width: 390px) {
+  .aqi-gauge-label {
+    font-size: 10px;
+  }
+}
+
+/* Increase the font size for screens larger than iphone 14 plus */
+@media screen and (min-width: 428px) {
+  .aqi-gauge-label {
+    font-size: 11px;
+  }
+}
+
+
 .aqi-gauge-label {
   position: flex;
+  font-size: 9px;
   text-align: center;
   font-weight: bold;
   transform-origin: center bottom;
@@ -130,37 +153,31 @@ overflow-x:hidden;
 
 
 .aqi-gauge-label-0 {
-  font-size: 9px;
   color: #000;
 }
 
 .aqi-gauge-label-1 {
-  font-size: 9px;
   transform: translateX(-20%) translateY(-40%);
   color: #000;
 }
 
 .aqi-gauge-label-2 {
-  font-size: 9px;
-  transform: translateX(-30%) translateY(-50%);
+  transform: translateX(-25%) translateY(-50%);
   color: #000;
 }
 
 .aqi-gauge-label-3 {
-  font-size: 9px;
-  transform: translateX(-5%) translateY(-60%);
+  transform: translateX(-2%) translateY(-60%);
   color: #ffffff;
 }
 
 .aqi-gauge-label-4 {
-  font-size: 9px;
-  transform: translateX(-5%) translateY(-50%);
+  transform: translateX(0%) translateY(-50%);
   color: #fff;
 }
 
 .aqi-gauge-label-5 {
-  font-size: 9px;
-  transform: translateX(-5%) translateY(0%);
+  transform: translateX(5%) translateY(0%);
   color: #fff;
 }
 
