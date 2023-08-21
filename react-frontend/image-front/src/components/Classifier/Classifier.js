@@ -320,18 +320,20 @@ class Classifier extends Component {
     getAQIPercent(aqiValue) {
       const equalSegmentRatio = 1 / 6; // 0.166
     
-      if (aqiValue <= 50) {
-        return aqiValue / 50 * equalSegmentRatio;
-      } else if (aqiValue <= 100) {
-        return equalSegmentRatio + (aqiValue - 50) / 50 * equalSegmentRatio;
-      } else if (aqiValue <= 150) {
-        return equalSegmentRatio * 2 + (aqiValue - 100) / 50 * equalSegmentRatio;
+      if (aqiValue <= 54) {
+        return aqiValue / 54 * equalSegmentRatio;
+      } else if (aqiValue <= 70) {
+        return equalSegmentRatio + (aqiValue - 54) / 16 * equalSegmentRatio;
+      } else if (aqiValue <= 85) {
+        return equalSegmentRatio * 2 + (aqiValue - 70) / 15 * equalSegmentRatio;
+      } else if (aqiValue <= 105) {
+        return equalSegmentRatio * 3 + (aqiValue - 85) / 20 * equalSegmentRatio;
       } else if (aqiValue <= 200) {
-        return equalSegmentRatio * 3 + (aqiValue - 150) / 50 * equalSegmentRatio;
-      } else if (aqiValue <= 300) {
-        return equalSegmentRatio * 4 + (aqiValue - 200) / 100 * equalSegmentRatio;
+        return equalSegmentRatio * 4 + (aqiValue - 105) / 95 * equalSegmentRatio;
       } else {
-        return equalSegmentRatio * 5 + (aqiValue - 300) / 200 * equalSegmentRatio;
+        //console.log(equalSegmentRatio * 5 + (aqiValue - 200) / 95 * equalSegmentRatio);
+        return 0.9934896074258042;
+        //return equalSegmentRatio * 5 + (aqiValue - 200) / 95 * equalSegmentRatio;
       }
     }
 
@@ -508,7 +510,7 @@ class Classifier extends Component {
                                 nrOfLevels={6}
                                 colors={['#00FF00', '#FFFF00', '#FFA500', '#FF4500', '#B70000', '#7C0A02']}
                                 arcsLength={[0.166, 0.166, 0.166, 0.166, 0.166, 0.166]}
-                                percent={this.getAQIPercent(Number.parseFloat(this.state.recentImage.data.analyzed))}
+                                percent={this.getAQIPercent(Number.parseFloat(this.state.recentImage.data.analyzed)/(8.0/Number.parseFloat(this.state.e_hr)+(Number.parseFloat(this.state.e_min)*0.0166667)))}
                                 textColor="#000000"
                                 needleColor="#d7d7d7"
                                 needleBaseColor="#d7d7d7"
@@ -522,7 +524,8 @@ class Classifier extends Component {
                                 animateDuration={1000}
                                 formatTextValue={(value) => {
                                   console.log('Received value:', value);
-                                  const aqi = Number(this.state.recentImage.data.analyzed);
+                                  const e_T = Number.parseFloat(this.state.e_hr)+(Number.parseFloat(this.state.e_min)*0.0166667);
+                                  const aqi = (Number.parseFloat(this.state.recentImage.data.analyzed)/(8.0/e_T));
                                   if (aqi > 0 && aqi <= 50) return 'Good';
                                   else if (aqi > 50 && aqi <= 100) return 'Moderate';
                                   else if (aqi > 100 && aqi <= 150) return 'Unhealthy for Sensitive Groups';

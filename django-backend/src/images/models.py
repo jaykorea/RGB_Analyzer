@@ -270,6 +270,7 @@ class SampleDetector:
         else:
             EA_sub_b = 0
         O_sub_3 = (EA_sub_b - 0.0052)/(0.00909*0.31309)
+        #PPB = O_sub_3*(8.0/e_T)
         PPB = O_sub_3*(8.0/e_T)
         S_TWA = O_sub_3
         
