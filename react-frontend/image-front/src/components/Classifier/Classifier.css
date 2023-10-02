@@ -150,32 +150,37 @@ overflow-x:hidden;
 }
 
 
+.aqi-gauge-label-0, .aqi-gauge-label-1, .aqi-gauge-label-2, .aqi-gauge-label-3, .aqi-gauge-label-4 {
+  font-size: calc(8px + 0.5vw); /* This ensures a base size of 14px and scales with the viewport width */
+}
+
 .aqi-gauge-label-0 {
   color: #000;
 }
 
 .aqi-gauge-label-1 {
-  transform: translateX(-20%) translateY(-40%);
+  transform: translateX(-25%) translateY(-40%);
   color: #000;
 }
 
 .aqi-gauge-label-2 {
-  transform: translateX(-28%) translateY(-50%);
+  transform: translateX(-30%) translateY(-50%);
   color: #000;
 }
 
 .aqi-gauge-label-3 {
-  transform: translateX(-7%) translateY(-60%);
-  color: #ffffff;
+  transform: translateX(-10%) translateY(-60%);
+  color: #fff;
 }
 
 .aqi-gauge-label-4 {
-  transform: translateX(0%) translateY(-50%);
+  transform: translateX(-5%) translateY(-50%);
   color: #fff;
 }
 
 .aqi-gauge-label-5 {
   transform: translateX(-3%) translateY(0%);
+  font-size: 20px;
   color: #fff;
 }
 
@@ -189,4 +194,5 @@ overflow-x:hidden;
 .aqi-gauge-tick-label span {
   display: inline-block;
   line-height: 1.0;
+  font-size: medium;
 }

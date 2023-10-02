@@ -52,14 +52,14 @@ class Classifier extends Component {
       const centerY = rect.height * 0.89;
       const radius = centerX * 0.7; // Adjust this value to match the actual gauge chart radius
     
-      const angles = [-165, -135, -105, -75, -45, -15];
+      const angles = [-160, -123, -87, -51, -15];
       const labelPositions = angles.map((angle) => {
         const radians = (angle * Math.PI) / 180;
         const x = centerX + radius * Math.cos(radians);
         const y = centerY + radius * Math.sin(radians);
         return { x, y };
       });
-      const tickAngles = [-180, -150, -120, -90, -60, -30, 0];
+      const tickAngles = [-179, -144, -108, -72, -35, -1];
       const tickLabelPositions = tickAngles.map((angle) => {
         const radius_t = (radius)*1.36;
         const centerX_t = (centerX)*0.97;
@@ -76,16 +76,11 @@ class Classifier extends Component {
     getAQILabel(index) {
 
       const labels = [
-        'Good',
-        'Moderate',
-        <span>
-        Unhealthy for<br />Sensitive<br />Groups
-        </span>,
-        'Unhealthy',
-        <span>
-        Very<br />Unhealthy
-        </span>,
-        'Hazardous',
+        <span>Good</span>,
+        <span>Moderate</span>,
+        <span>Unhealthy for<br />Sensitive<br />Groups</span>,
+        <span>Unhealthy</span>,
+        <span>Very<br />Unhealthy</span>
       ];
 
       switch (index) {
@@ -99,8 +94,6 @@ class Classifier extends Component {
           return labels[3];
         case 4:
           return labels[4];
-        case 5:
-          return labels[5];
         default:
           return 'None';
       }
@@ -115,7 +108,6 @@ class Classifier extends Component {
         '150',
         '200',
         '300',
-        '500',
       ];
       switch (index) {
         case 0:
@@ -128,8 +120,6 @@ class Classifier extends Component {
           return labels[3];
         case 4:
           return labels[4];
-        case 5:
-          return labels[5];
         default:
           return 'None';
       }
@@ -317,19 +307,81 @@ class Classifier extends Component {
         this.setState({ showProcessedImage: false });
     }
 
+    getAQIValue(ppb) {
+      const equalSegmentRatio = 1 / 5; // 0.166
+      let AQImin = 0;
+      let AQImax = 0;
+      let Pmin = 0;
+      let Pmax = 0;
+
+      if (ppb > 0 && ppb <= 54)
+        {
+          AQImin = 0;
+          AQImax = 50
+          Pmin = 0;
+          Pmax = 54;
+        }
+      else if (ppb > 54 && ppb <= 70)
+        {
+          AQImin = 51;
+          AQImax = 100;
+          Pmin = 55;
+          Pmax = 70;
+        }
+      else if (ppb > 70 && ppb <= 85)
+        {
+          AQImin = 101;
+          AQImax = 150;
+          Pmin = 71;
+          Pmax = 85;
+        }
+      else if (ppb > 85 && ppb <= 105)
+        {
+          AQImin = 151;
+          AQImax = 200;
+          Pmin = 86;
+          Pmax = 105;
+        }
+      else 
+        {
+          AQImin = 201;
+          AQImax = 300;
+          Pmin = 106;
+          Pmax = 200;
+        }
+
+      const AQI = (((ppb-Pmin)*(AQImax - AQImin))/Pmax-Pmin)+AQImin;
+      console.log("AQI value:", AQI);
+
+      if (AQI <= 50) {
+        return AQI / 50 * equalSegmentRatio;
+      } else if (AQI <= 100) {
+        return equalSegmentRatio + (AQI - 50) / 50 * equalSegmentRatio;
+      } else if (AQI <= 150) {
+        return equalSegmentRatio * 2 + (AQI - 100) / 50 * equalSegmentRatio;
+      } else if (AQI <= 200) {
+        return equalSegmentRatio * 3.1 + (AQI - 150) / 50 * equalSegmentRatio;
+      } else if (AQI <= 300) {
+        return equalSegmentRatio * 4.1 + (AQI - 200) / 100 * equalSegmentRatio;
+      } else {
+        //console.log(equalSegmentRatio * 5 + (AQI - 200) / 95 * equalSegmentRatio);
+        return 0.9934896074258042;
+      }
+    }
+
     getAQIPercent(aqiValue) {
-      const equalSegmentRatio = 1 / 6; // 0.166
+      const equalSegmentRatio = 1 / 5; // 0.166
     
-      if (aqiValue <= 54) {
-        return aqiValue / 54 * equalSegmentRatio;
-      } else if (aqiValue <= 70) {
-        return equalSegmentRatio + (aqiValue - 54) / 16 * equalSegmentRatio;
-      } else if (aqiValue <= 85) {
-        return equalSegmentRatio * 2 + (aqiValue - 70) / 15 * equalSegmentRatio;
-      } else if (aqiValue <= 105) {
-        return equalSegmentRatio * 3 + (aqiValue - 85) / 20 * equalSegmentRatio;
+      if (aqiValue <= 50) {
+        return aqiValue / 50 * equalSegmentRatio;
+      } else if (aqiValue <= 100) {
+        return equalSegmentRatio + (aqiValue - 50) / 50 * equalSegmentRatio;
+      } else if (aqiValue <= 150) {
+        return equalSegmentRatio * 2 + (aqiValue - 100) / 50 * equalSegmentRatio;
       } else if (aqiValue <= 200) {
-        return equalSegmentRatio * 4 + (aqiValue - 105) / 95 * equalSegmentRatio;
+        return equalSegmentRatio * 3 + (aqiValue - 150) / 50 * equalSegmentRatio;
+      } else if (aqiValue <= 300) {
+        return equalSegmentRatio * 4 + (aqiValue - 200) / 100 * equalSegmentRatio;
       } else {
         //console.log(equalSegmentRatio * 5 + (aqiValue - 200) / 95 * equalSegmentRatio);
         return 0.9934896074258042;
@@ -508,9 +560,10 @@ class Classifier extends Component {
                               <GaugeChart
                                 id="gauge-chart"
                                 nrOfLevels={6}
-                                colors={['#00FF00', '#FFFF00', '#FFA500', '#FF4500', '#B70000', '#7C0A02']}
-                                arcsLength={[0.166, 0.166, 0.166, 0.166, 0.166, 0.166]}
-                                percent={this.getAQIPercent(Number.parseFloat(this.state.recentImage.data.analyzed)/(8.0/Number.parseFloat(this.state.e_hr)+(Number.parseFloat(this.state.e_min)*0.0166667)))}
+                                colors={['#00FF00', '#FFFF00', '#FFA500', '#FF4500', '#B70000']}
+                                arcsLength={[0.2, 0.2, 0.2, 0.2, 0.2]}
+                                //percent={this.getAQIPercent(Number.parseFloat(this.state.recentImage.data.analyzed)/(8.0/(Number.parseFloat(this.state.e_hr)+(Number.parseFloat(this.state.e_min)*0.0166667))))}
+                                percent={this.getAQIValue(Number.parseFloat(this.state.recentImage.data.analyzed))}
                                 textColor="#000000"
                                 needleColor="#d7d7d7"
                                 needleBaseColor="#d7d7d7"
@@ -525,13 +578,13 @@ class Classifier extends Component {
                                 formatTextValue={(value) => {
                                   console.log('Received value:', value);
                                   const e_T = Number.parseFloat(this.state.e_hr)+(Number.parseFloat(this.state.e_min)*0.0166667);
+                                  const ppb = (Number.parseFloat(this.state.recentImage.data.analyzed)/(8.0/e_T));
                                   const aqi = (Number.parseFloat(this.state.recentImage.data.analyzed)/(8.0/e_T));
                                   if (aqi > 0 && aqi <= 50) return 'Good';
                                   else if (aqi > 50 && aqi <= 100) return 'Moderate';
                                   else if (aqi > 100 && aqi <= 150) return 'Unhealthy for Sensitive Groups';
                                   else if (aqi > 150 && aqi <= 200) return 'Unhealthy';
                                   else if (aqi > 200 && aqi <= 300) return 'Very Unhealthy';
-                                  else if (aqi > 300 && aqi <= 500) return 'Hazardous';
                                   else return 'None';
                                 }}
                               />
@@ -559,7 +612,7 @@ class Classifier extends Component {
                                         transform: `translate(${position.x}px, ${position.y}px)`,
                                       }}
                                     >
-                                      <span>{[0, 50, 100, 150, 200, 300, 500][index]}</span>
+                                      <span>{[0, 50, 100, 150, 200, 300][index]}</span>
                                     </div>
                                   ))}
                                 </div>
