@@ -350,7 +350,7 @@ class Classifier extends Component {
           Pmax = 200;
         }
 
-      const AQI = (((ppb-Pmin)*(AQImax - AQImin))/Pmax-Pmin)+AQImin;
+      const AQI = (((ppb-Pmin)*(AQImax - AQImin))/(Pmax-Pmin))+AQImin;
       console.log("AQI value:", AQI);
 
       if (AQI <= 50) {
